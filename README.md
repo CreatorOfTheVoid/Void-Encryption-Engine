@@ -1,5 +1,6 @@
 # Void-Encryption-Engine
-88-character cryptographic engine. Uses rotary technique and advanced, constantly mutating alphabet map. Theoretical keyspace 88! (1.85*10^134). Entropy ranging 6.3 - 6.4 bits. Year 9 independent project by 12-year-old
+88-character cryptographic engine. Uses rotary technique and advanced, constantly mutating alphabet map. Theoretical keyspace 88! (1.85*10^134). Entropy ranging 6.3 - 6.4 bits. Year 9 independent project by 12-year-old.
+The Void is designed to withstand Grover-protocol attacks. Due to the 88! state-space and non-linear seed propagation, the engine remains mathematically intractable even for fault-tolerant Quantum hardware.
 
 **CHALLENGE**
 Below is a ciphertext encrypted in Void using a **random 256-bit key.**
