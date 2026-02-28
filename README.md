@@ -16,3 +16,15 @@ Good luck.
 
 
 _The CC BY-NC-ND 4.0 legal text applies to this. Check LISCENCE for more information._
+
+VOID-ENCRYPTION-ENGINE
+
+© 2026 All rights reserved.
+
+USAGE:
+- This code may only be used for the official Void-Encryption-Engine challenge.
+- You may not copy, redistribute, modify, or use it for any other purpose.
+- Commercial use is strictly prohibited.
+- Any attempt to reverse-engineer or claim ownership outside the challenge is forbidden.
+
+By using this code, you agree to these terms.
