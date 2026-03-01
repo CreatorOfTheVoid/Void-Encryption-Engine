@@ -35,13 +35,7 @@ if mode == "E":
 
     # Ask for key.
     main_key = input("Enter Master Key: ")
-    
-    # Begin shuffling the Master Key.
-    seed = (len(main_key)**3) * 7919
-    temp_key = list(main_key)
-    random.seed(seed)
-    random.shuffle(temp_key)
-    main_key = "".join(temp_key)
+
 
     # Collect the ASCII numbers
     key = ""
@@ -117,13 +111,7 @@ elif mode == "D":
 
     # Ask for key.
     main_key = input("Enter Master Key: ")
-    
-     # Begin shuffling the Master Key.
-    seed = (len(main_key)**3) * 7919
-    temp_key = list(main_key)
-    random.seed(seed)
-    random.shuffle(temp_key)
-    main_key = "".join(temp_key)
+
     
 
     # Collect the ASCII numbers
