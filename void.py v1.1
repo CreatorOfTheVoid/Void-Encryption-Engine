@@ -21,9 +21,10 @@ import secrets
 import hashlib
 
 # Define major variables.
-standard_alphabet = r"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.@-_+!?,#$%^&*()={}[]\|/ "
-alphabet = r"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.@-_+!?,#$%^&*()={}[]\|/ "
-result = ""
+standard_alphabet = list(range(256))
+alphabet_list = list(range(256))
+result = bytearray()
+session_ID = ""
 
 
 print("WELCOME TO THE VOID.")
@@ -37,70 +38,76 @@ if mode == "E":
     main_key = input("Enter Master Key: ")
 
 
+    # Ask user for message.
+    raw_message = input("INPUT MESSAGE: ")
+
+    # Convert to bytes
+    message = raw_message.encode()
+
+
     # Collect the ASCII numbers
     key = ""
 
-    # Use hashlib to encrpt the key into a 64-char hexadecimal.
-    hash_key = hashlib.sha256(main_key.encode()).hexdigest()
-    
-    
+    # Generate a random session ID
+    session_ID += secrets.token_hex(75)
+
+    # Use hashlib to encrypt the key and message into a 64-char hexadecimal.
+    hash_key = hashlib.sha256((main_key+session_ID).encode()).hexdigest()
+
+    # Use hashlib to encrpt just the key into a 64-char hexadecimal for the ID.
+    ID_hash_key = hashlib.sha256((main_key).encode()).hexdigest()
+
+    # Define 'ID engine' to scramble ID..
+    ID_engine = random.Random(ID_hash_key)
+
+    # Turn the ID into a list.
+    ID_list = list(session_ID)
+
+    # Shuffle the list
+    ID_engine.shuffle(ID_list)
+
+    # Glue them back together.
+    scrambled_session_ID = "".join(ID_list)
+
     # Turn the hexadecimal into a Base-10 integer.
     scramble = int(hash_key, 16)
 
-    
-    # Define 'rotary'.
-    rotary = (scramble % 84) + 1
-
-
-    # Define 'engine' to scramble alphabet..
+    # Define 'engine' to scramble alphabet.
     engine = random.Random(scramble)
 
-    # Turn alphabet into a list.
-    alphabet_list = list(alphabet)
+
+    # Define 'rotary'.
+    rotary = (scramble % 255) + 1
 
     # Shuffle the list
     engine.shuffle(alphabet_list)
 
-    # Glue them back together.
-    alphabet = "".join(alphabet_list)
-    
     # Salt the rotors
-    alphabet = alphabet[len(main_key):]+ alphabet[:len(main_key)]
-
-    # Ask user for message.
-    message = input("INPUT MESSAGE: ")
+    alphabet_list = alphabet_list[len(main_key):]+ alphabet_list[:len(main_key)]
 
     # Run through every character.
     for char in message:
-        # Find the position of the original character in the normal alphabet.
-        position = standard_alphabet.find(char)
-        
-        # Find the character in the scrambled alphabet.
-        encrypted_char = alphabet[position]
+
+        # Use a binary value to find the equivalent of this byte
+        encrypted_byte = alphabet_list[char]
     
         # Add this to the result.
-        result = result + encrypted_char
+        result.append(encrypted_byte)
         
         # Spin the scrambled alphabet.
-        alphabet = alphabet[rotary % 85:] + alphabet[:rotary % 85]
+        alphabet_list = alphabet_list[rotary % 255:] + alphabet_list[:rotary % 255]
         
         # Accelerate the rotation for the next spin by 1.
         rotary  = rotary + 1
-        
-         # Turn alphabet into a list.
-        alphabet_list = list(alphabet)
-
+       
         # Shuffle the list
         engine.shuffle(alphabet_list)
-
-        # Glue them back together.
-        alphabet = "".join(alphabet_list)
     
         # Salt the rotors
-        alphabet = alphabet[len(main_key):]+ alphabet[:len(main_key)]
+        alphabet_list = alphabet_list[len(main_key):]+ alphabet_list[:len(main_key)]
     
     # Print the final, encrypted result.
-    print(result)
+    print(scrambled_session_ID + result.hex())
 
 
 
@@ -112,70 +119,74 @@ elif mode == "D":
     # Ask for key.
     main_key = input("Enter Master Key: ")
 
-    
+    # Ask user for message.
+    message_and_code = input("INPUT MESSAGE: ")
 
     # Collect the ASCII numbers
     key = ""
 
-    # Use hashlib to encrpt the key into a 64-char hexadecimal.
-    hash_key = hashlib.sha256(main_key.encode()).hexdigest()
+    # Separate the scrambled ID from the ciphertext
+    scrambled_id_part = message_and_code[:150]
+    message = message_and_code[150:] 
+
+    # Recreate the ID_hash_key to get the same seed
+    ID_hash_key = hashlib.sha256((main_key).encode()).hexdigest()
+    ID_engine = random.Random(ID_hash_key)
+
+    # Create a list of numbers that how ID may have shuffled
+    indices = list(range(150))
+
+    # Shuffle these positions exactly how the ID was shuffled
+    ID_engine.shuffle(indices)
     
+    # Place each character from the scrambled ID back into its original slot
+    unscrambled_list = [None] * 150
+    for i, original_pos in enumerate(indices):
+        unscrambled_list[original_pos] = scrambled_id_part[i]
     
-    # Turn the hexadecimal into a Base-10 integer.
+    unscrambled_session_ID = "".join(unscrambled_list)
+
+    # Reconstruct the Master hash_key used for the alphabet
+    hash_key = hashlib.sha256((main_key + unscrambled_session_ID).encode()).hexdigest()
     scramble = int(hash_key, 16)
 
+    #Convert message into bytes.
+    message = bytes.fromhex(message)
     
     # Define 'rotary'.
-    rotary = (scramble % 84) + 1
+    rotary = (scramble % 255) + 1
 
 
     # Scramble the alphabet using scramble seed.
     engine = random.Random(scramble)
 
-    # Turn alphabet into a list.
-    alphabet_list = list(alphabet)
-
     # Shuffle the list
     engine.shuffle(alphabet_list)
     
-
-    # Glue them back together.
-    alphabet = "".join(alphabet_list)
-    
     # Salt the rotors
-    alphabet = alphabet[len(main_key):]+ alphabet[:len(main_key)]
-    
-    # Ask user for message.
-    message = input("INPUT MESSAGE: ")
+    alphabet_list = alphabet_list[len(main_key):]+ alphabet_list[:len(main_key)]
     
     #Run through every character.
     for char in message:
         # Find the position of the original character in the scrambled alphabet.
-        position = alphabet.find(char)
-        
-        # Find the alphabet in the normal alphabet in the corrosponding sequence.
-        decrypted_char = standard_alphabet[position]
+        original_byte = alphabet_list.index(char)
+
         
         # Add this to the result.
-        result = result + decrypted_char
+        result.append(original_byte)
 
         #Spin the scrambled alphabet.
-        alphabet = alphabet[rotary % 85:] + alphabet[:rotary % 85]
+        alphabet_list = alphabet_list[rotary % 255:] + alphabet_list[:rotary % 255]
         
-        # Turn alphabet into a list.
-        alphabet_list = list(alphabet)
 
         # Shuffle the list
         engine.shuffle(alphabet_list)
-
-        # Glue them back together.
-        alphabet = "".join(alphabet_list)
     
         # Salt the rotors
-        alphabet = alphabet[len(main_key):]+ alphabet[:len(main_key)]
+        alphabet_list = alphabet_list[len(main_key):]+ alphabet_list[:len(main_key)]
         
         # Accelerate the rotation for the next spin by 1.
         rotary  = rotary + 1
         
-    # Print the final, encrypted result.
-    print(result)
+    # Print the final, decrypted result.
+    print(result.decode())
