@@ -1,6 +1,6 @@
 # Void-Encryption-Engine
 Hexadecimal cryptographic engine. Uses rotary technique and advanced, constantly mutating alphabet map. Theoretical keyspace 256! (8.57*10^506). Entropy ranging 3.97+ bits. Year 9 independent project by 12-year-old.
-The Void is designed to withstand Grover-protocol attacks. Due to the 88! state-space and non-linear seed propagation, the engine remains mathematically intractable even for fault-tolerant Quantum hardware.
+The Void is designed to withstand Grover-protocol attacks. Due to the 256! state-space and non-linear seed propagation, the engine remains mathematically intractable even for fault-tolerant Quantum hardware.
 
 **CHALLENGE**
 Below is a ciphertext encrypted in Void using a **256-bit key** and a **randomly generates 150-bit ID** which is unique for every use.
