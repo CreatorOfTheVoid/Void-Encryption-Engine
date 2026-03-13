@@ -72,9 +72,12 @@ if mode == "E":
     # Turn the hexadecimal into a Base-10 integer.
     scramble = int(hash_key, 16)
 
+    # Define the padding at the end.
+    noise_len = random.randint(10, 99)
+    noise = secrets.token_hex(noise_len)
+
     # Define 'engine' to scramble alphabet.
     engine = random.Random(scramble)
-
 
     # Define 'rotary'.
     rotary = (scramble % 255) + 1
@@ -105,9 +108,13 @@ if mode == "E":
     
         # Salt the rotors
         alphabet_list = alphabet_list[len(main_key):]+ alphabet_list[:len(main_key)]
+
+    # Split the result at len(master_key)
+    result_1 = result[:len(main_key)]
+    result_2 = result[len(main_key):]
     
     # Print the final, encrypted result.
-    print(scrambled_session_ID + result.hex())
+    print(scrambled_session_ID + result_1.hex() + str(noise_len) + result_2.hex() + noise)
 
 
 
@@ -120,14 +127,30 @@ elif mode == "D":
     main_key = input("Enter Master Key: ")
 
     # Ask user for message.
-    message_and_code = input("INPUT MESSAGE: ")
+    message_and_code_and_padding = input("INPUT MESSAGE: ")
 
     # Collect the ASCII numbers
     key = ""
 
     # Separate the scrambled ID from the ciphertext
-    scrambled_id_part = message_and_code[:150]
-    message = message_and_code[150:] 
+    scrambled_id_part = message_and_code_and_padding[:150]
+    message_and_padding = message_and_code_and_padding[150:] 
+
+    # Split message_and_padding
+    message_1 = message_and_padding[:len(main_key) * 2]   # hex chars
+    message_2 = message_and_padding[len(main_key) * 2:]   # rest
+
+    # Find the amount of padding
+    noise_len = int(message_2[:2])
+
+    # Erase the noise length from message_2
+    message_2 = message_2[2:]
+
+    # Create rudimentary message to join message 1 and 2 back together.
+    rmsg = message_1 + message_2
+
+    # Get the message
+    message = rmsg[:-(noise_len * 2)]
 
     # Recreate the ID_hash_key to get the same seed
     ID_hash_key = hashlib.sha256((main_key).encode()).hexdigest()
@@ -155,7 +178,6 @@ elif mode == "D":
     
     # Define 'rotary'.
     rotary = (scramble % 255) + 1
-
 
     # Scramble the alphabet using scramble seed.
     engine = random.Random(scramble)
