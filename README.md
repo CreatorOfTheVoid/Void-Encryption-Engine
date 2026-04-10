@@ -10,7 +10,8 @@ If you succeed or fail in breaking Void, please submit you attempt, method and r
 **THE CIPHERTEXT:**
 6e1b98aed4d85af632088cc4deeb54283764aaebc7264459407eb2517e00cfbceb6bcf819a45cb26c43049a7bfed49b435a6f11d5901b1f4c9d1beddf8222c3491267f204f9c6dd2d9eb0c1c967a422c940c538442826541b170d47eee6b332a1a35051db82657c6fdc42ccdcfe13dd50ce3bc868c113a526062a9a441588f1e43107c3be16c7a5d968c0d21f8ce
 
-Try any means to break it. The code is at your disposal. Report all attempts in the Issues tab. If you break this code congrats.
+Try any means to break it. The code is at your disposal. Report all attempts in the Issues tab. 
+If you break this code, ccongradulations! Report how you broke it in the Issues tab if you please.
 Good luck.
 
 
